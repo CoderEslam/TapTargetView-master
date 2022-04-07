@@ -1,0 +1,40 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.vanniktech.maven.publish'
+
+android {
+    compileSdkVersion defCompileSdkVersion
+
+    defaultConfig {
+        minSdkVersion defMinSdkVersion
+        targetSdkVersion defCompileSdkVersion
+    }
+}
+
+dependencies {
+    api "androidx.annotation:annotation:$defAndroidAnnotationVersion"
+    api "androidx.appcompat:appcompat:$defAppCompatVersion"
+    implementation "androidx.core:core:$defAndroidXCoreVersion"
+}
+
+// build a jar with source files
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    failOnError  false
+    source = android.sourceSets.main.java.sourceFiles
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+// build a jar with javadoc
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
